@@ -1,0 +1,6 @@
+@AddSolBackend_HostAddress = http://localhost:5108
+
+GET {{AddSolBackend_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

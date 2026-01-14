@@ -1,0 +1,12 @@
+{
+  "Version": 1,
+  "Hash": "BsWFePcB4Tv7BclmveZrQWDJ2xIr+QjhA39qX3Co4uI=",
+  "Source": "AddSolBackend",
+  "BasePath": "_content/AddSolBackend",
+  "Mode": "Default",
+  "ManifestType": "Build",
+  "ReferencedProjectsConfiguration": [],
+  "DiscoveryPatterns": [],
+  "Assets": [],
+  "Endpoints": []
+}
