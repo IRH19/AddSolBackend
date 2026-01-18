@@ -14,14 +14,15 @@ namespace AddSolBackend.Controllers
             _context = context;
         }
 
-        // 1. GET: Read all
+        // GET: api/employees
+        // Retrieves the full list of employees from the database
         [HttpGet]
         public async Task<ActionResult<IEnumerable<Employee>>> GetEmployees()
         {
             return await _context.Employees.ToListAsync();
         }
 
-        // 2. GET: Read ONE (New! Needed for the Edit page to load data first)
+        // 2. GET: Read ONE (Needed for the Edit page to load data first)
         [HttpGet("{id}")]
         public async Task<ActionResult<Employee>> GetEmployee(int id)
         {
@@ -30,7 +31,8 @@ namespace AddSolBackend.Controllers
             return employee;
         }
 
-        // 3. POST: Create new
+        // POST: api/employees
+        // Adds a new employee record after validating input
         [HttpPost]
         public async Task<ActionResult<Employee>> PostEmployee(Employee employee)
         {
@@ -39,7 +41,7 @@ namespace AddSolBackend.Controllers
             return CreatedAtAction(nameof(GetEmployees), new { id = employee.Id }, employee);
         }
 
-        // 4. PUT: Update existing (New!)
+        // 4. PUT: Update existing
         [HttpPut("{id}")]
         public async Task<IActionResult> PutEmployee(int id, Employee employee)
         {
@@ -60,7 +62,7 @@ namespace AddSolBackend.Controllers
             return NoContent();
         }
 
-        // 5. DELETE: Remove existing (New!)
+        // 5. DELETE: Remove existing
         [HttpDelete("{id}")]
         public async Task<IActionResult> DeleteEmployee(int id)
         {
