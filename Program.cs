@@ -1,57 +1,50 @@
-using AddSolBackend; // Import your files
-using Microsoft.EntityFrameworkCore; // Import the SQL tools
+using AddSolBackend;
+using Microsoft.EntityFrameworkCore;
+using AddSolBackend.Middleware; // Import the new folder
 
 var builder = WebApplication.CreateBuilder(args);
 
-// --- 1. DATABASE CONNECTION ---
+// 1. Add services to the container.
+builder.Services.AddControllers();
+builder.Services.AddEndpointsApiExplorer();
+builder.Services.AddSwaggerGen();
+
+// 2. Database Connection
 builder.Services.AddDbContext<AppDbContext>(options =>
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
 
-builder.Services.AddControllers();
+// 3. Register the Repository (Dependency Injection)
+builder.Services.AddScoped<IEmployeeRepository, EmployeeRepository>();
 
-// --- 2. ENABLE CORS (Frontend Connection) ---
+// 4. CORS Policy
 builder.Services.AddCors(options =>
 {
     options.AddPolicy("AllowReactApp",
-        policy =>
-        {
-            policy.WithOrigins("http://localhost:5173")
-                  .AllowAnyHeader()
-                  .AllowAnyMethod();
-        });
+        policy => policy.WithOrigins("http://localhost:5173")
+                        .AllowAnyMethod()
+                        .AllowAnyHeader());
 });
 
 var app = builder.Build();
 
-// --- 3. MIDDLEWARE PIPELINE ---
-app.UseHttpsRedirection();
+// 5. Configure the HTTP request pipeline.
+
+// NEW: Turn on the Global Exception Middleware (The Safety Net)
+// This must be at the very top of the pipeline to catch everything.
+app.UseMiddleware<ExceptionMiddleware>();
+
+if (app.Environment.IsDevelopment())
+{
+    app.UseSwagger();
+    app.UseSwaggerUI();
+}
+
 app.UseCors("AllowReactApp");
+
+app.UseHttpsRedirection();
+
 app.UseAuthorization();
 
-// --- 4. WEATHER DATA LOGIC (Keeping this for now until DB is ready) ---
-var summaries = new[]
-{
-    "Freezing", "Bracing", "Chilly", "Cool", "Mild", "Warm", "Balmy", "Hot", "Sweltering", "Scorching"
-};
-
-app.MapGet("/weatherforecast", () =>
-{
-    var forecast = Enumerable.Range(1, 5).Select(index =>
-        new WeatherForecast
-        (
-            DateOnly.FromDateTime(DateTime.Now.AddDays(index)),
-            Random.Shared.Next(-20, 55),
-            summaries[Random.Shared.Next(summaries.Length)]
-        ))
-        .ToArray();
-    return forecast;
-});
-
 app.MapControllers();
-app.Run();
 
-// --- 5. MODELS ---
-record WeatherForecast(DateOnly Date, int TemperatureC, string? Summary)
-{
-    public int TemperatureF => 32 + (int)(TemperatureC / 0.5556);
-}
+app.Run();
